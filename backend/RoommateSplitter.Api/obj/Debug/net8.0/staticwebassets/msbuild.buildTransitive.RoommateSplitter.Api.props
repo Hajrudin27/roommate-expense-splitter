@@ -1,3 +1,0 @@
-﻿<Project>
-  <Import Project="../buildMultiTargeting/RoommateSplitter.Api.props" />
-</Project>

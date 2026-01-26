@@ -1,0 +1,14 @@
+# macOS
+.DS_Store
+
+# .Net build output
+**/bin/
+**/obj/
+
+# Visual Studio Code
+.idea/
+.vs/
+.vscode/
+
+# User secrets
+**/secrets.json
