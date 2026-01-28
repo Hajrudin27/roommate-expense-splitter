@@ -7,6 +7,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "backend", "backend", "{0788
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RoommateSplitter.Api", "backend\RoommateSplitter.Api\RoommateSplitter.Api.csproj", "{BE1D5364-7B8D-4135-BE04-A4F6F80D064A}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RoommateSplitter.Domain", "RoommateSplitter.Domain\RoommateSplitter.Domain.csproj", "{6299A3C8-8000-4AD1-AE50-40CA989321F9}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -20,6 +22,10 @@ Global
 		{BE1D5364-7B8D-4135-BE04-A4F6F80D064A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{BE1D5364-7B8D-4135-BE04-A4F6F80D064A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{BE1D5364-7B8D-4135-BE04-A4F6F80D064A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6299A3C8-8000-4AD1-AE50-40CA989321F9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6299A3C8-8000-4AD1-AE50-40CA989321F9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6299A3C8-8000-4AD1-AE50-40CA989321F9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6299A3C8-8000-4AD1-AE50-40CA989321F9}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{BE1D5364-7B8D-4135-BE04-A4F6F80D064A} = {0788FAA3-25C1-415A-BBAD-1647AFD39FCB}
