@@ -42,9 +42,9 @@ public class Expense
         }
 
         var sum = shareList.Sum(s => s.Amount);
-        if (sum != amount)
+        if (Math.Abs(sum - amount) > 0.01m)
         {
-            throw new ArgumentException($"shares must sum to total amount. Sum = {sum}, Total = {amount}");
+            throw new ArgumentException($"Shares must sum to total amount. Sum={sum}, Total={amount}");
         }
 
         Id = Guid.NewGuid();
