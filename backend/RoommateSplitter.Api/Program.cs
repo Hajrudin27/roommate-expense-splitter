@@ -1,4 +1,5 @@
 using Microsoft.OpenApi.Models;
+using RoommateSplitter.Api.Repositories;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -7,6 +8,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddControllers();
+builder.Services.AddSingleton<IGroupsRepository, InMemoryGroupsRepository>();
 
 var app = builder.Build();
 

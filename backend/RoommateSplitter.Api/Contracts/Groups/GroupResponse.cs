@@ -1,3 +1,3 @@
-namespace RoomateSplitter.Api.Contracts.Groups;
+namespace RoommateSplitter.Api.Contracts.Groups;
 
-public record GroupResponse(Guid Id, string name, string Currency, DateTime CreatedAt);
+public record GroupResponse(Guid Id, string Name, string Currency, DateTime CreatedAt);
