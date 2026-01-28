@@ -9,6 +9,8 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddControllers();
 builder.Services.AddSingleton<IGroupsRepository, InMemoryGroupsRepository>();
+builder.Services.AddSingleton<IExpensesRepository, InMemoryExpensesRepository>();
+
 
 var app = builder.Build();
 
