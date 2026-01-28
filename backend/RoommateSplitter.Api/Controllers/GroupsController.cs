@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using RoomateSplitter.Api.Contracts.Groups;
 using RoommateSplitter.Api.Contracts.Groups;
 using RoommateSplitter.Domain.Groups;
 
@@ -24,20 +25,25 @@ public class GroupsController : ControllerBase
         Groups.Add(group);
 
         // 201 Created plus location header
-        return Created($"/api/groups/{group.Id}", new CreateGroupResponse(group.Id));
+       return CreatedAtAction(nameof(GetById), new { id = group.Id }, new CreateGroupResponse(group.Id));
     }
 
     // small helper endpoint
     [HttpGet]
     public IActionResult List()
     {
-        var result = Groups.Select(g => new
-        {
-            g.Id,
-            g.Name,
-            g.Currency,
-            g.CreatedAt
-        });
+        var result = Groups.Select(g => new GroupResponse(g.Id, g.Name, g.Currency, g.CreatedAt));
         return Ok(result);
     }
+
+    [HttpGet("{id:guid}")]
+    public IActionResult GetById(Guid id)
+        {
+      
+            var group = Groups.SingleOrDefault(g => g.Id == id);
+            if (group is null) return NotFound();
+
+            return Ok(new GroupResponse(group.Id, group.Name, group.Currency, group.CreatedAt));
+        }
+
 }
