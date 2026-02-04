@@ -37,6 +37,7 @@ public sealed class BalancesController : ControllerBase
             Currency: "DKK",
             NetBalances: result.NetBalances
                 .Select(kvp => new UserBalanceDto(kvp.Key, kvp.Value))
+                .Where(x => x.Amount != 0m)
                 .OrderByDescending(x => x.Amount)
                 .ToList(),
             Transfers: result.Transfers
