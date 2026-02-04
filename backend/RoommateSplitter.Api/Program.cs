@@ -10,7 +10,7 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddControllers();
 builder.Services.AddSingleton<IGroupsRepository, InMemoryGroupsRepository>();
 builder.Services.AddSingleton<IExpensesRepository, InMemoryExpensesRepository>();
-
+builder.Services.AddSingleton<IPaymentsRepository, InMemoryPaymentsRepository>();
 
 var app = builder.Build();
 
