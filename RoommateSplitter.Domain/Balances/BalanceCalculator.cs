@@ -1,4 +1,5 @@
 using RoommateSplitter.Domain.Expenses;
+using RoommateSplitter.Domain.Payments;
 
 namespace RoommateSplitter.Domain.Balances;
 
@@ -18,23 +19,54 @@ public sealed class BalanceCalculator
 
         foreach (var expense in expenses)
         {
-            // payer gets credited full amount
             Add(net, expense.PaidByUserId, expense.Amount);
 
-            // each participant share is a debit
             foreach (var share in expense.Shares)
             {
                 Add(net, share.UserId, -share.Amount);
             }
         }
+
+        return net.ToDictionary(kvp => kvp.Key, kvp => Round2(kvp.Value));
+    }
+
+    public BalanceResult Calculate(IEnumerable<Expense> expenses, IEnumerable<Payment> payments)
+    {
+        var net = CalculateNetBalances(expenses, payments);
+        var transfers = SuggestTransfers(net);
+
+        return new BalanceResult(net, transfers);
+    }
+
+    public IReadOnlyDictionary<Guid, decimal> CalculateNetBalances(
+        IEnumerable<Expense> expenses,
+        IEnumerable<Payment> payments)
+    {
+        var net = new Dictionary<Guid, decimal>();
+
+        foreach (var expense in expenses)
+        {
+            Add(net, expense.PaidByUserId, expense.Amount);
+
+            foreach (var share in expense.Shares)
+            {
+                Add(net, share.UserId, -share.Amount);
+            }
+        }
+
+        // Payments
+        foreach (var payment in payments)
+        {
+            Add(net, payment.FromUserId, payment.Amount);
+
+            Add(net, payment.ToUserId, -payment.Amount);
+        }
+
         return net.ToDictionary(kvp => kvp.Key, kvp => Round2(kvp.Value));
     }
 
     public IReadOnlyList<Transfer> SuggestTransfers(IReadOnlyDictionary<Guid, decimal> netBalances)
     {
-    
-        // return Array.Empty<Transfer>();
-
         var creditors = netBalances
             .Where(kvp => kvp.Value > 0m)
             .Select(kvp => (UserId: kvp.Key, Amount: kvp.Value))
@@ -42,7 +74,7 @@ public sealed class BalanceCalculator
 
         var debtors = netBalances
             .Where(kvp => kvp.Value < 0m)
-            .Select(kvp => (UserId: kvp.Key, Amount: -kvp.Value)) // store debt as positive
+            .Select(kvp => (UserId: kvp.Key, Amount: -kvp.Value))
             .ToList();
 
         var transfers = new List<Transfer>();
