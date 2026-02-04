@@ -12,12 +12,16 @@ public sealed class BalancesController : ControllerBase
     private readonly IGroupsRepository _groupsRepository;
     private readonly IExpensesRepository _expensesRepository;
 
+    private readonly IPaymentsRepository _payments;
+
     public BalancesController(
         IGroupsRepository groupsRepository,
-        IExpensesRepository expensesRepository)
+        IExpensesRepository expensesRepository,
+        IPaymentsRepository payments)
     {
         _groupsRepository = groupsRepository;
         _expensesRepository = expensesRepository;
+        _payments = payments;
     }
 
     [HttpGet]
@@ -28,9 +32,10 @@ public sealed class BalancesController : ControllerBase
             return NotFound();
 
         var expenses = _expensesRepository.ListByGroupId(groupId);
+        var payments = _payments.ListByGroupId(groupId);
 
         var calculator = new BalanceCalculator();
-        var result = calculator.Calculate(expenses);
+        var result = calculator.Calculate(expenses, payments);
 
         var response = new GetBalancesResponse(
             GroupId: groupId,
