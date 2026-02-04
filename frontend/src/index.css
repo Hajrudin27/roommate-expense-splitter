@@ -1,9 +1,13 @@
 :root {
   font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
   line-height: 1.5;
+  color: #111;
+  background: #f6f7f9;
 }
 
-* { box-sizing: border-box; }
+* {
+  box-sizing: border-box;
+}
 
 body {
   margin: 0;
@@ -11,51 +15,123 @@ body {
   color: #111;
 }
 
-a { color: inherit; }
-
-
 a {
-  font-weight: 500;
-  color: #646cff;
-  text-decoration: inherit;
-}
-a:hover {
-  color: #535bf2;
+  color: inherit;
+  text-decoration: none;
 }
 
+a:hover {
+  text-decoration: underline;
+}
+
+/* Layout */
+.app__header {
+  background: white;
+  border-bottom: 1px solid #e6e8ec;
+  padding: 16px 20px;
+  font-weight: 700;
+}
+
+.app__main {
+  padding: 24px 16px;
+}
+
+.container {
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+/* Utilities */
+.stack {
+  display: grid;
+  gap: 12px;
+}
+
+.muted {
+  opacity: 0.8;
+}
+
+/* Cards / sections */
+.card {
+  background: white;
+  border: 1px solid #e6e8ec;
+  border-radius: 12px;
+  padding: 16px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+}
+
+/* Typography */
 h1 {
-  font-size: 3.2em;
-  line-height: 1.1;
+  font-size: 28px;
+  margin: 0 0 8px;
+}
+
+h2 {
+  font-size: 18px;
+  margin: 0;
+}
+
+h3 {
+  font-size: 16px;
+  margin: 0;
+}
+
+p {
+  margin: 0;
+}
+
+ul {
+  margin: 0;
+  padding-left: 18px;
+}
+
+/* Forms */
+label {
+  display: grid;
+  gap: 6px;
+}
+
+input,
+select,
+button {
+  font: inherit;
+}
+
+input,
+select {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid #d7dbe3;
+  border-radius: 10px;
+  background: white;
+}
+
+input:focus,
+select:focus {
+  outline: 2px solid rgba(0, 0, 0, 0.15);
+  outline-offset: 2px;
 }
 
 button {
-  border-radius: 8px;
-  border: 1px solid transparent;
-  padding: 0.6em 1.2em;
-  font-size: 1em;
-  font-weight: 500;
-  font-family: inherit;
-  background-color: #1a1a1a;
+  padding: 10px 12px;
+  border: 1px solid #111;
+  border-radius: 10px;
+  background: #111;
+  color: white;
   cursor: pointer;
-  transition: border-color 0.25s;
-}
-button:hover {
-  border-color: #646cff;
-}
-button:focus,
-button:focus-visible {
-  outline: 4px auto -webkit-focus-ring-color;
 }
 
-@media (prefers-color-scheme: light) {
-  :root {
-    color: #213547;
-    background-color: #ffffff;
-  }
-  a:hover {
-    color: #747bff;
-  }
-  button {
-    background-color: #f9f9f9;
-  }
+button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Error box */
+.errorBox {
+  background: #fff5f5;
+  border: 1px solid #ffd6d6;
+  color: #a40000;
+  border-radius: 12px;
+  padding: 12px;
+  white-space: pre-wrap;
 }
