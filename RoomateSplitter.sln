@@ -11,6 +11,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RoommateSplitter.Domain", "
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RoommateSplitter.Domain.Tests", "RoommateSplitter.Domain.Tests\RoommateSplitter.Domain.Tests.csproj", "{BC58CB7E-F7F6-41EC-A78F-0DDC12B6D998}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RoommateSplitter.Infrastructure", "backend\RoommateSplitter.Infrastructure\RoommateSplitter.Infrastructure.csproj", "{618FFC13-B4CF-4F39-9114-381374EFA618}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -32,8 +34,13 @@ Global
 		{BC58CB7E-F7F6-41EC-A78F-0DDC12B6D998}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{BC58CB7E-F7F6-41EC-A78F-0DDC12B6D998}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{BC58CB7E-F7F6-41EC-A78F-0DDC12B6D998}.Release|Any CPU.Build.0 = Release|Any CPU
+		{618FFC13-B4CF-4F39-9114-381374EFA618}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{618FFC13-B4CF-4F39-9114-381374EFA618}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{618FFC13-B4CF-4F39-9114-381374EFA618}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{618FFC13-B4CF-4F39-9114-381374EFA618}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{BE1D5364-7B8D-4135-BE04-A4F6F80D064A} = {0788FAA3-25C1-415A-BBAD-1647AFD39FCB}
+		{618FFC13-B4CF-4F39-9114-381374EFA618} = {0788FAA3-25C1-415A-BBAD-1647AFD39FCB}
 	EndGlobalSection
 EndGlobal
