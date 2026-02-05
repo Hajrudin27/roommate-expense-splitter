@@ -22,6 +22,7 @@ public class ExpenseRow
     public string Description { get; set; } = null!;
 
     public DateTime ExpenseDate { get; set; }
+    public DateTime CreatedAt { get; set; }
 
     public List<ExpenseShareRow> Shares { get; set; } = new();
 }

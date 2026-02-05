@@ -43,6 +43,7 @@ public sealed class EfExpensesRepository : IExpensesRepository
             Amount = expense.Amount,
             Description = expense.Description,
             ExpenseDate = expense.ExpenseDate.ToDateTime(TimeOnly.MinValue),
+            CreatedAt = expense.CreatedAt,
             Shares = expense.Shares.Select(s => new ExpenseShareRow
             {
                 Id = Guid.NewGuid(),
@@ -65,6 +66,8 @@ public sealed class EfExpensesRepository : IExpensesRepository
         DomainHydrator.Set(e, nameof(Expense.Amount), row.Amount);
         DomainHydrator.Set(e, nameof(Expense.PaidByUserId), row.PaidByUserId);
         DomainHydrator.Set(e, nameof(Expense.ExpenseDate), DateOnly.FromDateTime(row.ExpenseDate));
+        DomainHydrator.Set(e, nameof(Expense.CreatedAt), row.CreatedAt);
+
 
         var shares = row.Shares
             .Select(s => new ExpenseShare(s.UserId, s.Amount))

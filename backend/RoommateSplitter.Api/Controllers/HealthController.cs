@@ -2,7 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using RoommateSplitter.Domain.Repositories;
 
 
-namespace RoomateSplitter.Api.Controllers;
+namespace RoommateSplitter.Api.Controllers;
 
 [ApiController]
 [Route("api/health")]

@@ -36,10 +36,12 @@ if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
-    app.UseCors("Frontend");
-    app.MapControllers();
 }
 
+app.UseCors("Frontend");
+
 app.UseHttpsRedirection();
+
+app.MapControllers();
 
 app.Run();

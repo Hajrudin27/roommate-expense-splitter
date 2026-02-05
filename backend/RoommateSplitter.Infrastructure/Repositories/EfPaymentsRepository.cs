@@ -22,6 +22,7 @@ public sealed class EfPaymentsRepository : IPaymentsRepository
             ToUserId = payment.ToUserId,
             Amount = payment.Amount,
             PaymentDate = payment.PaymentDate.ToDateTime(TimeOnly.MinValue),
+            CreatedAt = payment.CreatedAt,
         };
 
         _db.Payments.Add(row);
@@ -47,6 +48,7 @@ public sealed class EfPaymentsRepository : IPaymentsRepository
         DomainHydrator.Set(p, nameof(Payment.ToUserId), row.ToUserId);
         DomainHydrator.Set(p, nameof(Payment.Amount), row.Amount);
         DomainHydrator.Set(p, nameof(Payment.PaymentDate), DateOnly.FromDateTime(row.PaymentDate));
+        DomainHydrator.Set(p, nameof(Payment.CreatedAt), row.CreatedAt);
         return p;
     }
 }
