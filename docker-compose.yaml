@@ -1,0 +1,15 @@
+services:
+  postgres:
+    image: postgres:16
+    container_name: rm_splitter_postgres
+    environment:
+      POSTGRES_DB: rm_splitter
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5433:5432"
+    volumes:
+      - rm_splitter_pgdata:/var/lib/postgresql/data
+
+volumes:
+  rm_splitter_pgdata:
