@@ -1,4 +1,5 @@
 using RoommateSplitter.Domain.Groups;
+using RoommateSplitter.Domain.Repositories;
 
 namespace RoommateSplitter.Api.Repositories;
 

@@ -94,10 +94,8 @@ export default function GroupPage() {
 
   useEffect(() => {
     load();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [groupId]);
 
-  // When we get data, bootstrap labels + default selects
   useEffect(() => {
     if (!groupId || !data) return;
 
@@ -108,11 +106,8 @@ export default function GroupPage() {
     try {
       const raw = localStorage.getItem(storageKey());
       if (raw) saved = JSON.parse(raw);
-    } catch {
-      // ignore
-    }
+    } catch {}
 
-    // Ensure stable "User 1, User 2..." labels
     const merged: Record<string, string> = { ...saved };
 
     const usedNumbers = new Set<number>();
@@ -136,10 +131,8 @@ export default function GroupPage() {
     setUserLabels(merged);
     localStorage.setItem(storageKey(), JSON.stringify(merged));
 
-    // Default participants = all users (good for equal split)
     setParticipantUserIds((prev) => (prev.length ? prev : ids));
-
-    // Default dropdown selections
+ 
     setPaidByUserId((prev) => prev || ids[0] || "");
     setFromUserId((prev) => prev || ids[0] || "");
     setToUserId((prev) => prev || ids[1] || ids[0] || "");
@@ -150,9 +143,7 @@ export default function GroupPage() {
     setUserLabels(next);
     try {
       localStorage.setItem(storageKey(), JSON.stringify(next));
-    } catch {
-      // ignore
-    }
+    } catch {}
   }
 
   function toggleParticipant(userId: string) {
@@ -185,7 +176,6 @@ export default function GroupPage() {
 
       setDesc("");
       setAmount("");
-      // keep paidBy + participants for rapid entry
       await load();
     } catch (err: any) {
       setError(err?.message ?? "Failed to create expense");

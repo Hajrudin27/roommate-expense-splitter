@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using RoommateSplitter.Api.Contracts.Expenses;
-using RoommateSplitter.Api.Repositories;
+using RoommateSplitter.Domain.Repositories;
 using RoommateSplitter.Domain.Expenses;
 
 namespace RoommateSplitter.Api.Controllers;
@@ -35,10 +35,8 @@ public class ExpensesController : ControllerBase
         if (request.ParticipantUserIds is null || request.ParticipantUserIds.Count == 0)
             return BadRequest(new { error = "At least one participant is required." });
 
-        // 3) build shares (equal split for now)
         var shares = ExpenseSplit.Equal(request.Amount, request.ParticipantUserIds);
 
-        // 4) create domain expense
         Expense expense;
         try
         {

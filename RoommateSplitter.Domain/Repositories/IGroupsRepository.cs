@@ -1,6 +1,6 @@
 using RoommateSplitter.Domain.Groups;
 
-namespace RoommateSplitter.Api.Repositories;
+namespace RoommateSplitter.Domain.Repositories;
 
 public interface IGroupsRepository
 {

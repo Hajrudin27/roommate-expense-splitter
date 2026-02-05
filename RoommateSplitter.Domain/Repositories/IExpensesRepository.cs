@@ -1,5 +1,6 @@
-using RoommateSplitter.Api.Repositories;
 using RoommateSplitter.Domain.Expenses;
+
+namespace RoommateSplitter.Domain.Repositories;
 
 public interface IExpensesRepository
 {

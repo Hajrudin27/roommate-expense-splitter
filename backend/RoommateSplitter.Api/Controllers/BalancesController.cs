@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using RoommateSplitter.Api.Contracts.Balances;
-using RoommateSplitter.Api.Repositories;
+using RoommateSplitter.Domain.Repositories;
 using RoommateSplitter.Domain.Balances;
 
 namespace RoommateSplitter.Api.Controllers;

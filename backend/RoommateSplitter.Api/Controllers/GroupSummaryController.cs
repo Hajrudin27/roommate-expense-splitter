@@ -3,10 +3,9 @@ using RoommateSplitter.Api.Contracts.Balances;
 using RoommateSplitter.Api.Contracts.Expenses;
 using RoommateSplitter.Api.Contracts.Payments;
 using RoommateSplitter.Api.Contracts.Summary;
-using RoommateSplitter.Api.Repositories;
+using RoommateSplitter.Domain.Repositories;
 using RoommateSplitter.Domain.Balances;
 using RoommateSplitter.Api.Contracts.Groups;
-
 
 namespace RoommateSplitter.Api.Controllers;
 

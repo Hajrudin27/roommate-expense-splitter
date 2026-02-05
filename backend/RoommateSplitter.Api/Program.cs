@@ -1,12 +1,11 @@
 using Microsoft.OpenApi.Models;
-using RoommateSplitter.Api.Repositories;
+using RoommateSplitter.Domain.Repositories;
 using Microsoft.EntityFrameworkCore;
 using RoommateSplitter.Infrastructure.Persistence;
+using RoommateSplitter.Infrastructure.Repositories;
+
 
 var builder = WebApplication.CreateBuilder(args);
-
-// Add services to the container.
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 builder.Services.AddDbContext<RoommateSplitterDbContext>(options =>
@@ -15,9 +14,9 @@ builder.Services.AddDbContext<RoommateSplitterDbContext>(options =>
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddControllers();
-builder.Services.AddSingleton<IGroupsRepository, InMemoryGroupsRepository>();
-builder.Services.AddSingleton<IExpensesRepository, InMemoryExpensesRepository>();
-builder.Services.AddSingleton<IPaymentsRepository, InMemoryPaymentsRepository>();
+builder.Services.AddScoped<IGroupsRepository, EfGroupsRepository>();
+builder.Services.AddScoped<IExpensesRepository, EfExpensesRepository>();
+builder.Services.AddScoped<IPaymentsRepository, EfPaymentsRepository>();
 
 builder.Services.AddCors(options =>
 {
@@ -33,7 +32,6 @@ builder.Services.AddCors(options =>
 var app = builder.Build();
 
 
-// Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();

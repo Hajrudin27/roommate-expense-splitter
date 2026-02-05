@@ -54,7 +54,6 @@ public sealed class BalanceCalculator
             }
         }
 
-        // Payments
         foreach (var payment in payments)
         {
             Add(net, payment.FromUserId, payment.Amount);

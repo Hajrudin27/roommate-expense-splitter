@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using RoommateSplitter.Api.Contracts.Payments;
-using RoommateSplitter.Api.Repositories;
+using RoommateSplitter.Domain.Repositories;
 using RoommateSplitter.Domain.Payments;
 
 namespace RoommateSplitter.Api.Controllers;
@@ -23,11 +23,9 @@ public sealed class PaymentsController : ControllerBase
     [HttpPost]
     public IActionResult Create(Guid groupId, [FromBody] CreatePaymentRequest request)
     {
-        // 1) group must exist
         if (_groups.GetById(groupId) is null)
             return NotFound(new { error = "Group not found." });
 
-        // 2) basic validation
         if (request.Amount <= 0m)
             return BadRequest(new { error = "Amount must be > 0." });
 

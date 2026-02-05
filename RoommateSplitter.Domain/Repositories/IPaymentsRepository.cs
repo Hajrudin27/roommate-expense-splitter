@@ -1,6 +1,6 @@
 using RoommateSplitter.Domain.Payments;
 
-namespace RoommateSplitter.Api.Repositories;
+namespace RoommateSplitter.Domain.Repositories;
 
 public interface IPaymentsRepository
 {

@@ -1,4 +1,5 @@
 using RoommateSplitter.Domain.Payments;
+using RoommateSplitter.Domain.Repositories;
 
 namespace RoommateSplitter.Api.Repositories;
 

@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using RoommateSplitter.Api.Contracts.Groups;
-using RoommateSplitter.Api.Repositories;
+using RoommateSplitter.Domain.Repositories;
 using RoommateSplitter.Domain.Groups;
 
 namespace RoommateSplitter.Api.Controllers;
