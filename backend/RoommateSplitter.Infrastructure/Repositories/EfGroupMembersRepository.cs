@@ -49,4 +49,28 @@ public sealed class EfGroupMembersRepository : IGroupMembersRepository
         DomainHydrator.Set(m, nameof(GroupMember.JoinedAt), row.JoinedAt);
         return m;
     }
+    public IReadOnlyList<(Guid GroupId, Guid UserId, string Email, string Name, string Role, DateTime JoinedAt)>
+    ListWithUsersByGroupId(Guid groupId)
+{
+    var rows =
+        from m in _db.GroupMembers.AsNoTracking()
+        join u in _db.Users.AsNoTracking() on m.UserId equals u.Id
+        where m.GroupId == groupId
+        orderby m.JoinedAt
+        select new
+        {
+            m.GroupId,
+            m.UserId,
+            u.Email,
+            u.Name,
+            m.Role,
+            m.JoinedAt
+        };
+
+    return rows
+        .ToList()
+        .Select(x => (x.GroupId, x.UserId, x.Email, x.Name, ((RoommateSplitter.Domain.Groups.GroupRole)x.Role).ToString(), x.JoinedAt))
+        .ToList();
+}
+
 }

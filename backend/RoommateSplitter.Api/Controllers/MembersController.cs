@@ -11,17 +11,17 @@ namespace RoommateSplitter.Api.Controllers;
 public sealed class MembersController : ControllerBase
 {
     private readonly IGroupsRepository _groups;
-    private readonly IUsersRepository _users;
-    private readonly IGroupMembersRepository _members;
+    private readonly IUsersRepository _usersRepository;
+    private readonly IGroupMembersRepository _groupMembersRepository;
 
     public MembersController(
         IGroupsRepository groups,
-        IUsersRepository users,
-        IGroupMembersRepository members)
+        IUsersRepository usersRepository,
+        IGroupMembersRepository groupMembersRepository)
     {
         _groups = groups;
-        _users = users;
-        _members = members;
+        _usersRepository = usersRepository;
+        _groupMembersRepository = groupMembersRepository;
     }
 
     [HttpGet]
@@ -30,22 +30,16 @@ public sealed class MembersController : ControllerBase
         if (_groups.GetById(groupId) is null)
             return NotFound(new { error = "Group not found." });
 
-        var memberships = _members.ListByGroupId(groupId);
+        var members = _groupMembersRepository.ListWithUsersByGroupId(groupId);
 
-        // For now, fetch user info per member (fine for small groups).
-        // Later you can optimize with a join query in infrastructure.
-        var result = memberships.Select(m =>
-        {
-            var user = _users.GetById(m.UserID);
-            return new MemberResponse(
-                GroupId: groupId,
-                UserId: m.UserID,
-                Email: user?.Email ?? "",
-                Name: user?.Name ?? "",
-                Role: m.Role.ToString(),
-                JoinedAt: m.JoinedAt
-            );
-        }).ToList();
+        var result = members.Select(m => new MemberResponse(
+            GroupId: m.GroupId,
+            UserId: m.UserId,
+            Email: m.Email,
+            Name: m.Name,
+            Role: m.Role,
+            JoinedAt: m.JoinedAt
+        )).ToList();
 
         return Ok(result);
     }
@@ -72,19 +66,18 @@ public sealed class MembersController : ControllerBase
             role = parsed;
         }
 
-        // Reuse existing user by email
-        var user = _users.GetByEmail(email);
+        var user = _usersRepository.GetByEmail(email);
         if (user is null)
         {
             user = new User(email, name);
-            _users.Add(user);
+            _usersRepository.Add(user);
         }
 
-        if (_members.Exists(groupId, user.Id))
+        if (_groupMembersRepository.Exists(groupId, user.Id))
             return Conflict(new { error = "User is already a member of this group." });
 
         var member = new GroupMember(groupId, user.Id, role);
-        _members.Add(member);
+        _groupMembersRepository.Add(member);
 
         return CreatedAtAction(nameof(List), new { groupId }, new CreateMemberResponse(user.Id));
     }

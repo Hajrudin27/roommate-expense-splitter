@@ -18,20 +18,17 @@ public sealed class GroupSummaryController : ControllerBase
     private readonly IExpensesRepository _expenses;
     private readonly IPaymentsRepository _payments;
     private readonly IGroupMembersRepository _groupMembersRepository;
-    private readonly IUsersRepository _usersRepository;
 
     public GroupSummaryController(
         IGroupsRepository groups,
         IExpensesRepository expenses,
         IPaymentsRepository payments,
-        IGroupMembersRepository groupMembersRepository,
-        IUsersRepository usersRepository)
+        IGroupMembersRepository groupMembersRepository)
     {
         _groups = groups;
         _expenses = expenses;
         _payments = payments;
         _groupMembersRepository = groupMembersRepository;
-        _usersRepository = usersRepository;
     }
 
     [HttpGet]
@@ -41,20 +38,17 @@ public sealed class GroupSummaryController : ControllerBase
         if (group is null)
             return NotFound(new { error = "Group not found." });
 
-        var membersDomain = _groupMembersRepository.ListByGroupId(groupId);
-        var membersDto = membersDomain.Select(m =>
-        {
-            var u = _usersRepository.GetById(m.UserID);
+        var members = _groupMembersRepository.ListWithUsersByGroupId(groupId);
 
-            return new MemberResponse(
-                GroupId: m.GroupID,
-                UserId: m.UserID,
-                Email: u?.Email ?? "",
-                Name: u?.Name ?? "",
-                Role: m.Role.ToString(),
-                JoinedAt: m.JoinedAt
-            );
-        }).ToList();
+        var membersDto = members.Select(m => new MemberResponse(
+            GroupId: m.GroupId,
+            UserId: m.UserId,
+            Email: m.Email,
+            Name: m.Name,
+            Role: m.Role,
+            JoinedAt: m.JoinedAt
+        )).ToList();
+
 
         var expenses = _expenses.ListByGroupId(groupId);
         var payments = _payments.ListByGroupId(groupId);
