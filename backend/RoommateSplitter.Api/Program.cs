@@ -17,6 +17,9 @@ builder.Services.AddControllers();
 builder.Services.AddScoped<IGroupsRepository, EfGroupsRepository>();
 builder.Services.AddScoped<IExpensesRepository, EfExpensesRepository>();
 builder.Services.AddScoped<IPaymentsRepository, EfPaymentsRepository>();
+builder.Services.AddScoped<IUsersRepository, EfUsersRepository>();
+builder.Services.AddScoped<IGroupMembersRepository, EfGroupMembersRepository>();
+
 
 builder.Services.AddCors(options =>
 {

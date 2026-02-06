@@ -45,6 +45,7 @@ export type GroupResponse = {
   
   export type GroupSummaryResponse = {
     group: GroupResponse;
+    members: MemberResponse[];
     expenses: ExpenseResponse[];
     payments: PaymentResponse[];
     balances: GetBalancesResponse;
@@ -63,5 +64,20 @@ export type GroupResponse = {
     toUserId: string;
     amount: number;
     paymentDate: string; // "YYYY-MM-DD"
+  };
+  
+  export type MemberResponse = {
+    groupId: string;
+    userId: string;
+    email: string;
+    name: string;
+    role: string;
+    joinedAt: string;
+  };
+  
+  export type CreateMemberRequest = {
+    email: string;
+    name: string;
+    role?: string; // "admin" | "member"
   };
   

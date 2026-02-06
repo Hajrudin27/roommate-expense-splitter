@@ -14,15 +14,23 @@ public class RoommateSplitterDbContext : DbContext
     public DbSet<ExpenseRow> Expenses => Set<ExpenseRow>();
     public DbSet<ExpenseShareRow> ExpenseShares => Set<ExpenseShareRow>();
     public DbSet<PaymentRow> Payments => Set<PaymentRow>();
+    public DbSet<UserRow> Users => Set<UserRow>();
+    public DbSet<GroupMemberRow> GroupMembers => Set<GroupMemberRow>();
+
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        base.OnModelCreating(modelBuilder);
+        modelBuilder.Entity<GroupMemberRow>()
+            .HasKey(m => new { m.GroupId, m.UserId });
 
-        modelBuilder.Entity<ExpenseRow>()
-            .HasMany(e => e.Shares)
-            .WithOne()
-            .HasForeignKey(s => s.ExpenseId)
+        modelBuilder.Entity<UserRow>()
+            .HasIndex(u => u.Email)
+            .IsUnique();
+
+        modelBuilder.Entity<GroupMemberRow>()
+            .HasOne(m => m.User)
+            .WithMany()
+            .HasForeignKey(m => m.UserId)
             .OnDelete(DeleteBehavior.Cascade);
     }
 }
