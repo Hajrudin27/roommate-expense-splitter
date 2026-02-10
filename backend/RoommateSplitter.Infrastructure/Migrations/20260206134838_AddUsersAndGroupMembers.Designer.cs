@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using RoommateSplitter.Infrastructure.Persistence;
@@ -11,9 +12,11 @@ using RoommateSplitter.Infrastructure.Persistence;
 namespace RoommateSplitter.Infrastructure.Migrations
 {
     [DbContext(typeof(RoommateSplitterDbContext))]
-    partial class RoommateSplitterDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260206134838_AddUsersAndGroupMembers")]
+    partial class AddUsersAndGroupMembers
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
