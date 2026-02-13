@@ -3,7 +3,7 @@ using RoommateSplitter.Infrastructure.Persistence.Models;
 
 namespace RoommateSplitter.Infrastructure.Persistence;
 
-public class RoommateSplitterDbContext : DbContext
+public sealed class RoommateSplitterDbContext : DbContext
 {
     public RoommateSplitterDbContext(DbContextOptions<RoommateSplitterDbContext> options)
         : base(options)
@@ -17,20 +17,30 @@ public class RoommateSplitterDbContext : DbContext
     public DbSet<UserRow> Users => Set<UserRow>();
     public DbSet<GroupMemberRow> GroupMembers => Set<GroupMemberRow>();
 
-
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        modelBuilder.Entity<GroupMemberRow>()
-            .HasKey(m => new { m.GroupId, m.UserId });
+        base.OnModelCreating(modelBuilder);
 
-        modelBuilder.Entity<UserRow>()
-            .HasIndex(u => u.Email)
-            .IsUnique();
+        modelBuilder.Entity<UserRow>(entity =>
+        {
+            entity.HasIndex(u => u.Email).IsUnique();
+        });
 
-        modelBuilder.Entity<GroupMemberRow>()
-            .HasOne(m => m.User)
-            .WithMany()
-            .HasForeignKey(m => m.UserId)
-            .OnDelete(DeleteBehavior.Cascade);
+        modelBuilder.Entity<GroupMemberRow>(entity =>
+        {
+            entity.HasKey(m => m.Id);
+
+            entity.Property(m => m.Id)
+                .ValueGeneratedOnAdd()
+                .HasDefaultValueSql("gen_random_uuid()");
+ 
+            entity.HasIndex(m => new { m.GroupId, m.UserId })
+                .IsUnique();
+
+            entity.HasOne(m => m.User)
+                .WithMany()
+                .HasForeignKey(m => m.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
+        });
     }
 }

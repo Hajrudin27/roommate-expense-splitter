@@ -21,8 +21,10 @@ public sealed class EfPaymentsRepository : IPaymentsRepository
             FromUserId = payment.FromUserId,
             ToUserId = payment.ToUserId,
             Amount = payment.Amount,
-            PaymentDate = payment.PaymentDate.ToDateTime(TimeOnly.MinValue),
-            CreatedAt = payment.CreatedAt,
+
+            PaymentDate = payment.PaymentDate.ToDateTime(TimeOnly.MinValue, DateTimeKind.Utc),
+
+            CreatedAt = EnsureUtc(payment.CreatedAt),
         };
 
         _db.Payments.Add(row);
@@ -42,13 +44,26 @@ public sealed class EfPaymentsRepository : IPaymentsRepository
     private static Payment MapToDomain(PaymentRow row)
     {
         var p = DomainHydrator.Create<Payment>();
+
         DomainHydrator.Set(p, nameof(Payment.Id), row.Id);
         DomainHydrator.Set(p, nameof(Payment.GroupId), row.GroupId);
         DomainHydrator.Set(p, nameof(Payment.FromUserId), row.FromUserId);
         DomainHydrator.Set(p, nameof(Payment.ToUserId), row.ToUserId);
         DomainHydrator.Set(p, nameof(Payment.Amount), row.Amount);
+
         DomainHydrator.Set(p, nameof(Payment.PaymentDate), DateOnly.FromDateTime(row.PaymentDate));
-        DomainHydrator.Set(p, nameof(Payment.CreatedAt), row.CreatedAt);
+        DomainHydrator.Set(p, nameof(Payment.CreatedAt), EnsureUtc(row.CreatedAt));
+
         return p;
+    }
+
+    private static DateTime EnsureUtc(DateTime dt)
+    {
+        return dt.Kind switch
+        {
+            DateTimeKind.Utc => dt,
+            DateTimeKind.Local => dt.ToUniversalTime(),
+            _ => DateTime.SpecifyKind(dt, DateTimeKind.Utc) 
+        };
     }
 }

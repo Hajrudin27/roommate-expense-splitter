@@ -35,6 +35,10 @@ public sealed class EfExpensesRepository : IExpensesRepository
 
     public void Add(Expense expense)
     {
+        var expenseDateUtc = expense.ExpenseDate.ToDateTime(TimeOnly.MinValue, DateTimeKind.Utc);
+
+        var createdAtUtc = EnsureUtc(expense.CreatedAt);
+
         var row = new ExpenseRow
         {
             Id = expense.Id,
@@ -42,8 +46,10 @@ public sealed class EfExpensesRepository : IExpensesRepository
             PaidByUserId = expense.PaidByUserId,
             Amount = expense.Amount,
             Description = expense.Description,
-            ExpenseDate = expense.ExpenseDate.ToDateTime(TimeOnly.MinValue),
-            CreatedAt = expense.CreatedAt,
+
+            ExpenseDate = expenseDateUtc,
+            CreatedAt = createdAtUtc,
+
             Shares = expense.Shares.Select(s => new ExpenseShareRow
             {
                 Id = Guid.NewGuid(),
@@ -65,9 +71,10 @@ public sealed class EfExpensesRepository : IExpensesRepository
         DomainHydrator.Set(e, nameof(Expense.Description), row.Description);
         DomainHydrator.Set(e, nameof(Expense.Amount), row.Amount);
         DomainHydrator.Set(e, nameof(Expense.PaidByUserId), row.PaidByUserId);
-        DomainHydrator.Set(e, nameof(Expense.ExpenseDate), DateOnly.FromDateTime(row.ExpenseDate));
-        DomainHydrator.Set(e, nameof(Expense.CreatedAt), row.CreatedAt);
 
+        DomainHydrator.Set(e, nameof(Expense.ExpenseDate), DateOnly.FromDateTime(row.ExpenseDate));
+
+        DomainHydrator.Set(e, nameof(Expense.CreatedAt), EnsureUtc(row.CreatedAt));
 
         var shares = row.Shares
             .Select(s => new ExpenseShare(s.UserId, s.Amount))
@@ -76,5 +83,15 @@ public sealed class EfExpensesRepository : IExpensesRepository
         DomainHydrator.SetField(e, "_shares", shares);
 
         return e;
+    }
+
+    private static DateTime EnsureUtc(DateTime dt)
+    {
+        return dt.Kind switch
+        {
+            DateTimeKind.Utc => dt,
+            DateTimeKind.Local => dt.ToUniversalTime(),
+            _ => DateTime.SpecifyKind(dt, DateTimeKind.Utc) 
+        };
     }
 }

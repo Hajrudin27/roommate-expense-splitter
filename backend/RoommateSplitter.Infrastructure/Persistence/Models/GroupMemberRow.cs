@@ -4,6 +4,9 @@ namespace RoommateSplitter.Infrastructure.Persistence.Models;
 
 public class GroupMemberRow
 {
+    [Key]
+    public Guid Id { get; set; }
+
     [Required]
     public Guid GroupId { get; set; }
 

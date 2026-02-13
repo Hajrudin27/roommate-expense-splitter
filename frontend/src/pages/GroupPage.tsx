@@ -14,6 +14,8 @@ function shortId(id: string) {
 function collectKnownUserIds(data: GroupSummaryResponse): string[] {
   const ids = new Set<string>();
 
+  data.members.forEach((m) => ids.add(m.userId));
+
   // balances
   data.balances.netBalances.forEach((b) => ids.add(b.userId));
   data.balances.transfers.forEach((t) => {
@@ -46,9 +48,14 @@ export default function GroupPage() {
   // UI-only user labels
   const [userLabels, setUserLabels] = useState<Record<string, string>>({});
 
+  // Add Member form
+  const [memberName, setMemberName] = useState("");
+  const [memberEmail, setMemberEmail] = useState("");
+  const [memberRole, setMemberRole] = useState("Member");
+
   // Add Expense form
   const [desc, setDesc] = useState("");
-  const [amount, setAmount] = useState<string>(""); // string = nicer input UX
+  const [amount, setAmount] = useState<string>("");
   const [paidByUserId, setPaidByUserId] = useState("");
   const [expenseDate, setExpenseDate] = useState(() =>
     new Date().toISOString().slice(0, 10)
@@ -94,14 +101,16 @@ export default function GroupPage() {
 
   useEffect(() => {
     load();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [groupId]);
 
+  // Initialize / merge labels whenever group data changes
   useEffect(() => {
     if (!groupId || !data) return;
 
     const ids = collectKnownUserIds(data);
 
-    // Load saved labels
+    // load saved labels
     let saved: Record<string, string> = {};
     try {
       const raw = localStorage.getItem(storageKey());
@@ -110,10 +119,18 @@ export default function GroupPage() {
 
     const merged: Record<string, string> = { ...saved };
 
+    // use member names as defaults when available
+    const memberNameById = new Map<string, string>();
+    data.members.forEach((m) => {
+
+      const maybeName = (m as any).name as string | undefined;
+      if (maybeName?.trim()) memberNameById.set(m.userId, maybeName.trim());
+    });
+
     const usedNumbers = new Set<number>();
     Object.values(merged).forEach((v) => {
-      const m = /^User (\d+)$/.exec(v);
-      if (m) usedNumbers.add(Number(m[1]));
+      const match = /^User (\d+)$/.exec(v);
+      if (match) usedNumbers.add(Number(match[1]));
     });
 
     let next = 1;
@@ -121,18 +138,25 @@ export default function GroupPage() {
 
     for (const id of ids) {
       if (!merged[id]) {
-        merged[id] = `User ${next}`;
-        usedNumbers.add(next);
-        do next++;
-        while (usedNumbers.has(next));
+        const named = memberNameById.get(id);
+        if (named) {
+          merged[id] = named;
+        } else {
+          merged[id] = `User ${next}`;
+          usedNumbers.add(next);
+          do next++;
+          while (usedNumbers.has(next));
+        }
       }
     }
 
     setUserLabels(merged);
-    localStorage.setItem(storageKey(), JSON.stringify(merged));
+    try {
+      localStorage.setItem(storageKey(), JSON.stringify(merged));
+    } catch {}
 
+    // form defaults
     setParticipantUserIds((prev) => (prev.length ? prev : ids));
- 
     setPaidByUserId((prev) => prev || ids[0] || "");
     setFromUserId((prev) => prev || ids[0] || "");
     setToUserId((prev) => prev || ids[1] || ids[0] || "");
@@ -152,6 +176,33 @@ export default function GroupPage() {
         ? prev.filter((x) => x !== userId)
         : [...prev, userId]
     );
+  }
+
+  async function onAddMember(e: React.FormEvent) {
+    e.preventDefault();
+    if (!groupId) return;
+
+    setError(null);
+
+    const body = {
+      name: memberName.trim(),
+      email: memberEmail.trim(),
+      role: memberRole,
+    };
+
+    try {
+      await http(`/api/groups/${groupId}/members`, {
+        method: "POST",
+        body: JSON.stringify(body),
+      });
+
+      setMemberName("");
+      setMemberEmail("");
+      setMemberRole("Member");
+      await load();
+    } catch (err: any) {
+      setError(err?.message ?? "Failed to add member");
+    }
   }
 
   async function onCreateExpense(e: React.FormEvent) {
@@ -232,22 +283,84 @@ export default function GroupPage() {
           </section>
 
           <section className="card stack">
+            <h2>Members</h2>
+
+            {data.members.length === 0 ? (
+              <div className="muted">
+                This group has no members yet. Add members below to unlock expenses/payments.
+              </div>
+            ) : (
+              <ul>
+                {data.members.map((m) => (
+                  <li key={m.userId}>
+                    <b>{labelOf(m.userId)}</b>{" "}
+                    <span
+                      className="muted"
+                      style={{ fontFamily: "monospace", fontSize: 12 }}
+                      title={m.userId}
+                    >
+                      ({shortId(m.userId)})
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            )}
+
+            <h3>Add member</h3>
+            <form onSubmit={onAddMember} className="stack">
+              <input
+                placeholder="Name"
+                value={memberName}
+                onChange={(e) => setMemberName(e.target.value)}
+                required
+              />
+              <input
+                placeholder="Email"
+                value={memberEmail}
+                onChange={(e) => setMemberEmail(e.target.value)}
+                required
+              />
+
+              <label>
+                <span className="muted" style={{ fontSize: 12 }}>
+                  Role
+                </span>
+                <select
+                  value={memberRole}
+                  onChange={(e) => setMemberRole(e.target.value)}
+                >
+                  <option value="Member">Member</option>
+                  <option value="Admin">Admin</option>
+                </select>
+              </label>
+
+              <button type="submit">Add member</button>
+            </form>
+          </section>
+
+          <section className="card stack">
             <h2>Users (UI labels)</h2>
 
             {knownUserIds.length === 0 ? (
-              <div className="muted">
-                No users found yet. Add an expense/payment and the UI will learn the GUIDs.
-              </div>
+              <div className="muted">No users found yet.</div>
             ) : (
               <div className="stack" style={{ gap: 8 }}>
                 {knownUserIds.map((id) => (
                   <label
                     key={id}
-                    style={{ display: "grid", gridTemplateColumns: "140px 1fr", gap: 10 }}
+                    style={{
+                      display: "grid",
+                      gridTemplateColumns: "140px 1fr",
+                      gap: 10,
+                    }}
                   >
                     <span
                       className="muted"
-                      style={{ fontFamily: "monospace", fontSize: 12, alignSelf: "center" }}
+                      style={{
+                        fontFamily: "monospace",
+                        fontSize: 12,
+                        alignSelf: "center",
+                      }}
                       title={id}
                     >
                       {shortId(id)}
@@ -474,8 +587,8 @@ export default function GroupPage() {
               <ul>
                 {data.balances.transfers.map((t, idx) => (
                   <li key={idx}>
-                    <b>{labelOf(t.fromUserId)}</b> → <b>{labelOf(t.toUserId)}</b>{" "}
-                    : <b>{t.amount.toFixed(2)}</b>
+                    <b>{labelOf(t.fromUserId)}</b> → <b>{labelOf(t.toUserId)}</b> :{" "}
+                    <b>{t.amount.toFixed(2)}</b>
                   </li>
                 ))}
               </ul>
@@ -509,8 +622,8 @@ export default function GroupPage() {
               <ul>
                 {data.payments.map((p) => (
                   <li key={p.id}>
-                    <b>{labelOf(p.fromUserId)}</b> → <b>{labelOf(p.toUserId)}</b>{" "}
-                    — {p.amount.toFixed(2)} —{" "}
+                    <b>{labelOf(p.fromUserId)}</b> → <b>{labelOf(p.toUserId)}</b> —{" "}
+                    {p.amount.toFixed(2)} —{" "}
                     <span className="muted">{p.paymentDate}</span>
                   </li>
                 ))}

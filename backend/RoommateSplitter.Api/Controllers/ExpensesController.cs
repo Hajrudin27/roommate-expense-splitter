@@ -1,13 +1,13 @@
 using Microsoft.AspNetCore.Mvc;
 using RoommateSplitter.Api.Contracts.Expenses;
-using RoommateSplitter.Domain.Repositories;
 using RoommateSplitter.Domain.Expenses;
+using RoommateSplitter.Domain.Repositories;
 
 namespace RoommateSplitter.Api.Controllers;
 
 [ApiController]
 [Route("api/groups/{groupId:guid}/expenses")]
-public class ExpensesController : ControllerBase
+public sealed class ExpensesController : ControllerBase
 {
     private readonly IGroupsRepository _groups;
     private readonly IExpensesRepository _expenses;
@@ -32,6 +32,9 @@ public class ExpensesController : ControllerBase
         if (request.Amount <= 0)
             return BadRequest(new { error = "Amount must be > 0." });
 
+        if (request.PaidByUserId == Guid.Empty)
+            return BadRequest(new { error = "PaidByUserId is required." });
+
         if (request.ParticipantUserIds is null || request.ParticipantUserIds.Count == 0)
             return BadRequest(new { error = "At least one participant is required." });
 
@@ -42,10 +45,10 @@ public class ExpensesController : ControllerBase
         {
             expense = new Expense(
                 groupId,
-                request.Description,
+                request.Description.Trim(),
                 request.Amount,
                 request.PaidByUserId,
-                request.ExpenseDate,
+                request.ExpenseDate, // ✅ DateOnly stays DateOnly
                 shares
             );
         }
@@ -73,8 +76,8 @@ public class ExpensesController : ControllerBase
             e.Description,
             e.Amount,
             e.PaidByUserId,
-            e.ExpenseDate,
-            e.CreatedAt,
+            e.ExpenseDate, // ✅ DateOnly
+            e.CreatedAt,   // likely DateTime
             e.Shares.Select(s => new ExpenseShareResponse(s.UserId, s.Amount)).ToList()
         ));
 
