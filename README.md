@@ -1,120 +1,159 @@
-Roommate Expense Splitter (Backend)
-A backend API for splitting shared expenses between roommates, inspired by apps like Splitwise.
-Built with .NET 8, clean domain logic, and fully testable money calculations.
-This project focuses on correct financial logic, clean architecture, and API-first design.
-A frontend UI is planned for a later phase.
+# 🏠 Roommate Expense Splitter API
 
+A backend REST API for splitting shared expenses between roommates, inspired by apps like **Splitwise**.
 
-Features
-* Create groups
-* Add expenses (equal split with correct rounding)
-* Track who paid and who owes
-* Record payments between users
-* Automatically calculate balances (who owes whom)
-* Suggest settlement transfers
-* Fetch a full group summary in one API call
-* In-memory repositories (easy to replace with DB later)
-* Unit-tested domain logic
+This project is built with **.NET 8**, follows **Clean Architecture**, and uses a real **PostgreSQL database running in Docker** for persistent storage.
 
-Architecture Overview
-The solution is structured using a clean separation of concerns:
+It focuses on:
+
+- Correct financial calculations  
+- Clean separation of domain logic  
+- Database-backed persistence with EF Core  
+- API-first design ready for frontend integration  
+
+---
+
+## ✨ Features
+
+- Create roommate groups  
+- Add shared expenses with equal split logic  
+- Track who paid and who owes  
+- Record payments between roommates  
+- Automatically calculate balances per user  
+- Suggest settlement transfers (minimal transactions)  
+- Retrieve full group summaries in one API call  
+- PostgreSQL persistence using Docker + EF Core  
+- Unit-tested business logic in the domain layer  
+
+---
+
+## 🧱 Project Architecture
+
+The solution is structured using **Clean Architecture** principles:
 
 rm-splitter/
-├─ RoommateSplitter.Domain        * Core business logic (pure C#)
-│  ├─ Expenses                    * Expense + split logic
-│  ├─ Payments                    * Payment domain model
-│  └─ Balances                    * Balance calculation + settlements
+├─ RoommateSplitter.Domain
+│ ├─ Core business rules and financial logic
+│ ├─ Expense splitting and balance calculations
 │
-├─ RoommateSplitter.Domain.Tests  * xUnit tests for domain logic
+├─ RoommateSplitter.Domain.Tests
+│ └─ xUnit tests ensuring correctness of money logic
 │
-└─ backend/RoommateSplitter.Api   * ASP.NET Web API
-   ├─ Controllers                 * HTTP endpoints
-   ├─ Contracts                   * Request/response DTOs
-   └─ Repositories                * In-memory persistence
+└─ backend/
+├─ RoommateSplitter.Api
+│ ├─ Controllers (REST endpoints)
+│ └─ Contracts (DTOs)
+│
+└─ RoommateSplitter.Infrastructure
+├─ EF Core + PostgreSQL persistence
+└─ Database repositories
 
-Key principles
-* Domain logic is framework-agnostic
-* API layer only orchestrates and maps data
-* Financial calculations are fully unit-tested
-* No UI or persistence assumptions baked into the domain
 
-💰 How balances are calculated
-For each group:
-1. Expenses
-    * Payer gets credited the full amount
-    * Each participant gets debited their share
-2. Payments
-    * FromUserId gets credited (they owe less)
-    * ToUserId gets debited (they are owed less)
-3. Net balance
-    * Positive → user should receive money
-    * Negative → user owes money
-4. Settlement suggestions
-    * Debtors are matched to creditors
-    * Minimal set of transfers is generated
+---
 
-All calculations use decimal and proper rounding.
+## 🗄 Database Setup (PostgreSQL + Docker)
 
-API Endpoints
-    * Health
-        --> GET /api/health
-    * Groups 
-        --> POST /api/groups
-        --> GET  /api/groups
-        --> GET  /api/groups/{groupId}
-    * Expenses
-        --> POST /api/groups/{groupId}/expenses
-        --> GET  /api/groups/{groupId}/expenses
-    * Payments
-        --> POST /api/groups/{groupId}/payments
-        --> GET  /api/groups/{groupId}/payments
-    * Balances
-        --> GET /api/groups/{groupId}/balances
+This project uses **PostgreSQL 16** in a Docker container.
+
+### Start the Database
+
+Run:
+
+```bash
+docker compose up -d
+
+This will create:
+* Database: rm_splitter
+* User: postgres
+* Password: postgres
+* Port: 5433 → 5432
+A persistent Docker volume is also created:
+* rm_splitter_pgdata
+
+🚀 Running the API
+Once PostgreSQL is running, start the backend API:
+cd backend/RoommateSplitter.Api
+dotnet run
+
+The API will launch locally and expose Swagger documentation.
+
+📌 API Endpoints
+* Health Check
+    * GET /api/health
+* Groups
+    * POST /api/groups
+    * GET /api/groups
+    * GET /api/groups/{groupId}
+* Expenses
+    * POST /api/groups/{groupId}/expenses
+    * GET /api/groups/{groupId}/expenses
+* Payments
+    * POST /api/groups/{groupId}/payments
+    * GET /api/groups/{groupId}/payments
+* Balances
+    * GET /api/groups/{groupId}/balances
+
 Returns:
-* net balances per user
-* suggested settlement transfers
+* Net balances per roommate
+* Suggested settlement transfers
 
-Group Summary (UI-friendly)
-    --> GET /api/groups/{groupId}/summary
+Group Summary (Frontend Ready)
+    * GET /api/groups/{groupId}/summary
 
-Returns in one call:
-    * group info
-    * expenses
-    * payments
-    * balances + settlement suggestions
-This endpoint is intended to power a future frontend.
+Returns everything in one call:
+    * Group details
+    * Expenses
+    * Payments
+    * Net balances
+    * Settlement suggestions 
 
-Testing
-All money logic is tested in the domain layer using xUnit:
-    * Equal split calculations
-    * Multiple expenses
-    * Payments reducing balances
-    * Overpayment edge cases
-    * Net balance correctness
+💰 Balance Calculation Logic
+The system calculates balances as follows:
+    * Expenses
+        --> Payer is credited the full amount
+        --> Each participant is debited their share
+    * Payments
+        --> Sender owes less
+        --> Receiver is owed less
+    * Net Balance
+        --> Positive → user should receive money
+        --> Negative → user owes money
 
-Tech Stack
-    * .NET 8
-    * ASP.NET Core Web API
-    * xUnit
-    * Swagger / OpenAPI
-    * In-memory repositories (no DB yet)
+Settlement Suggestions
+* Debtors are matched with creditors to generate the smallest number of transfers.
+* All calculations use decimal for financial accuracy.
 
-Future Work
-    * Frontend UI (React)
-    * User & authentication support
-    * Persistent database (PostgreSQL)
-    * Currency support
-    * Custom split types
+🧪 Testing
+Domain logic is tested with xUnit, including:
+    * Equal expense splits
+    * Multiple expenses in a group
+    * Payments reducing debts
+    * Edge cases (overpayment, rounding)
+    * Correct settlement suggestions
+Run tests with:
+dotnet test
 
-Author
-Built as a personal portfolio project to demonstrate:
-    * backend architecture
-    * domain-driven thinking
-    * financial correctness
-    * testable business logic
+🛠 Tech Stack
+    --> .NET 8
+    --> ASP.NET Core Web API
+    --> Entity Framework Core
+    --> PostgreSQL (Docker)
+    --> Npgsql Provider
+    --> Swagger / OpenAPI
+    --> xUnit Testing
 
+🔮 Future Improvements
+    --> Frontend UI (React or Angular)
+    --> Authentication + user accounts
+    --> Custom split types (percent, unequal)
+    --> Multi-currency support
+    --> Deployment with Docker + Cloud hosting
 
-
-
+👤 Author
+Built as a portfolio project to demonstrate:
+    --> Clean backend architecture
+    --> Domain-driven financial logic
+    --> PostgreSQL integration
+    --> Testable and scalable API design
 
 
