@@ -58,8 +58,6 @@ This project uses **PostgreSQL 16** in a Docker container.
 ### Start the Database
 
 Run:
-
-```bash
 docker compose up -d
 
 This will create:
