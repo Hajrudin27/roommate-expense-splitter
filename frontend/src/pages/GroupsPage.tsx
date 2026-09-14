@@ -18,8 +18,8 @@ export default function GroupsPage() {
     try {
       const data = await http<GroupResponse[]>("/api/groups");
       setGroups(data);
-    } catch (e: any) {
-      setError(e?.message ?? "Failed to load groups");
+    } catch (e: unknown) {
+      setError(e instanceof Error ? e.message : "Failed to load groups");
     } finally {
       setIsLoading(false);
     }
@@ -40,8 +40,8 @@ export default function GroupsPage() {
       await http("/api/groups", { method: "POST", body: JSON.stringify(body) });
       setName("");
       await load();
-    } catch (e: any) {
-      setError(e?.message ?? "Failed to create group");
+    } catch (e: unknown) {
+      setError(e instanceof Error ? e.message : "Failed to create group");
     } finally {
       setIsCreating(false);
     }

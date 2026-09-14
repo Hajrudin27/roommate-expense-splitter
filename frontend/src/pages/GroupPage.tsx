@@ -75,9 +75,7 @@ export default function GroupPage() {
     return collectKnownUserIds(data);
   }, [data]);
 
-  function storageKey() {
-    return `rm-splitter:user-labels:${groupId ?? "unknown"}`;
-  }
+  const storageKey = `rm-splitter:user-labels:${groupId ?? "unknown"}`;
 
   function labelOf(userId: string) {
     return userLabels[userId] ?? `User (${shortId(userId)})`;
@@ -92,8 +90,8 @@ export default function GroupPage() {
         `/api/groups/${groupId}/summary`
       );
       setData(summary);
-    } catch (e: any) {
-      setError(e?.message ?? "Failed to load group summary");
+    } catch (e: unknown) {
+      setError(e instanceof Error ? e.message : "Failed to load group summary");
     } finally {
       setIsLoading(false);
     }
@@ -113,9 +111,11 @@ export default function GroupPage() {
     // load saved labels
     let saved: Record<string, string> = {};
     try {
-      const raw = localStorage.getItem(storageKey());
+      const raw = localStorage.getItem(storageKey);
       if (raw) saved = JSON.parse(raw);
-    } catch {}
+    } catch {
+      // Labels are optional UI preferences; unavailable storage must not block the group.
+    }
 
     const merged: Record<string, string> = { ...saved };
 
@@ -123,7 +123,7 @@ export default function GroupPage() {
     const memberNameById = new Map<string, string>();
     data.members.forEach((m) => {
 
-      const maybeName = (m as any).name as string | undefined;
+      const maybeName = m.name;
       if (maybeName?.trim()) memberNameById.set(m.userId, maybeName.trim());
     });
 
@@ -152,22 +152,26 @@ export default function GroupPage() {
 
     setUserLabels(merged);
     try {
-      localStorage.setItem(storageKey(), JSON.stringify(merged));
-    } catch {}
+      localStorage.setItem(storageKey, JSON.stringify(merged));
+    } catch {
+      // Labels are optional UI preferences; unavailable storage must not block the group.
+    }
 
     // form defaults
     setParticipantUserIds((prev) => (prev.length ? prev : ids));
     setPaidByUserId((prev) => prev || ids[0] || "");
     setFromUserId((prev) => prev || ids[0] || "");
     setToUserId((prev) => prev || ids[1] || ids[0] || "");
-  }, [data, groupId]);
+  }, [data, groupId, storageKey]);
 
   function updateUserLabel(userId: string, newLabel: string) {
     const next = { ...userLabels, [userId]: newLabel };
     setUserLabels(next);
     try {
-      localStorage.setItem(storageKey(), JSON.stringify(next));
-    } catch {}
+      localStorage.setItem(storageKey, JSON.stringify(next));
+    } catch {
+      // Labels are optional UI preferences; unavailable storage must not block the group.
+    }
   }
 
   function toggleParticipant(userId: string) {
@@ -200,8 +204,8 @@ export default function GroupPage() {
       setMemberEmail("");
       setMemberRole("Member");
       await load();
-    } catch (err: any) {
-      setError(err?.message ?? "Failed to add member");
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : "Failed to add member");
     }
   }
 
@@ -228,8 +232,8 @@ export default function GroupPage() {
       setDesc("");
       setAmount("");
       await load();
-    } catch (err: any) {
-      setError(err?.message ?? "Failed to create expense");
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : "Failed to create expense");
     }
   }
 
@@ -254,8 +258,8 @@ export default function GroupPage() {
 
       setPaymentAmount("");
       await load();
-    } catch (err: any) {
-      setError(err?.message ?? "Failed to create payment");
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : "Failed to create payment");
     }
   }
 

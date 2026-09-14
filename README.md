@@ -1,5 +1,7 @@
 # Roommate Expense Splitter API
 
+[![CI](https://github.com/Hajrudin27/roommate-expense-splitter/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/Hajrudin27/roommate-expense-splitter/actions/workflows/ci.yml)
+
 A REST API for splitting shared costs between flatmates and working out who owes whom.
 
 **C# / .NET 8 · ASP.NET Core · PostgreSQL · Docker · xUnit**
@@ -109,6 +111,8 @@ cd frontend
 npm run lint
 npm run build
 ```
+
+GitHub Actions runs the .NET build/tests and frontend lint/build on pull requests and pushes to `main`. It does not require a running database or secrets.
 
 The solution filename really is `RoomateSplitter.sln`. The xUnit suite covers domain calculations; it is not an HTTP or PostgreSQL integration suite.
 
